@@ -1,4 +1,3 @@
-
 {# Add Project Form #}
 <form id="add-project-form"
       hx-post="{% url 'add_project' %}"
@@ -50,4 +49,12 @@
             </form>
         </div>
     </div>
+        <div id="tasks-container">
+            <div id="tasks-content-{{ project.id }}"
+                 hx-get="{% url 'load_tasks' project.id %}"
+                 hx-trigger="load"
+                 hx-target="#tasks-content-{{ project.id }}"
+                 hx-swap="innerHTML">
+            </div>
+        </div>
 {% endfor %}
