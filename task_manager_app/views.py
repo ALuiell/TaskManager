@@ -16,30 +16,18 @@ def load_projects_view(request):
     projects = Project.objects.filter(user=request.user)
     return render(request, "task_manager_app/projects_list.html", {"projects": projects})
 
-
+# add_project view for the version where the project list logic
+# works based on individual project_item templates instead of reloading the entire list.
+@login_required
 def add_project_view(request):
     if request.method == "POST":
         project_name = request.POST.get("name")
         if not project_name:
             return HttpResponseBadRequest("Project name is required.")
 
-        Project.objects.create(name=project_name, user=request.user)
-        projects = Project.objects.filter(user=request.user)
-        return render(request, "task_manager_app/projects_list.html", {"projects": projects})
+        project = Project.objects.create(name=project_name, user=request.user)
 
-
-# add_project view for the version where the project list logic
-# works based on individual project_item templates instead of reloading the entire list.
-# @login_required
-# def add_project_view(request):
-#     if request.method == "POST":
-#         project_name = request.POST.get("name")
-#         if not project_name:
-#             return HttpResponseBadRequest("Project name is required.")
-#
-#         project = Project.objects.create(name=project_name, user=request.user)
-#
-#         return render(request, "task_manager_app/projects_list.html", {"project": project})
+        return render(request, "task_manager_app/project_item.html", {"project": project})
 
 def update_project_view(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)

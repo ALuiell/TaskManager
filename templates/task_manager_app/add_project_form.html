@@ -1,0 +1,10 @@
+<form id="add-project-form"
+      hx-post="{% url 'add_project' %}"
+      hx-target="#projects-content"
+      hx-swap="beforeend">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <input type="text" name="name" class="form-control" placeholder="Enter project name..." required>
+        <button class="btn btn-success">➕ Add Project</button>
+    </div>
+</form>

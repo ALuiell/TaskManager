@@ -1,15 +1,5 @@
 {# Add Task Form #}
-<form id="add-task-form-{{ project.id }}"
-      hx-post="{% url 'add_task' project.id %}"
-      hx-target="#tasks-content-{{ project.id }}"
-      hx-swap="innerHTML"
-      hx-include="#add-task-form-{{ project.id }}">
-    {% csrf_token %}
-    <div class="input-group mb-3">
-        <input type="text" name="name" class="form-control" placeholder="Enter task name..." required>
-        <button class="btn btn-success">➕ Add Task</button>
-    </div>
-</form>
+{% include "task_manager_app/add_task_form.html" %}
 
 {# Task List #}
 <ul class="list-group">
@@ -17,7 +7,9 @@
         <li class="list-group-item d-flex justify-content-between">
             <strong>{{ task.name }}</strong>
             <div>
+                {# Change Priority Task #}
                 <button class="btn btn-sm btn-outline-secondary">🔼</button>
+                {# Update Task #}
                 <button class="btn btn-sm btn-outline-primary">✏️</button>
                 {# Delete Task #}
                 <form hx-post="{% url 'delete_task' task.id %}"

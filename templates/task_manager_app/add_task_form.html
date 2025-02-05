@@ -1,0 +1,11 @@
+<form id="add-task-form-{{ project.id }}"
+      hx-post="{% url 'add_task' project.id %}"
+      hx-target="#tasks-content-{{ project.id }}"
+      hx-swap="innerHTML"
+      hx-include="#add-task-form-{{ project.id }}">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <input type="text" name="name" class="form-control" placeholder="Enter task name..." required>
+        <button class="btn btn-success">➕ Add Task</button>
+    </div>
+</form>
