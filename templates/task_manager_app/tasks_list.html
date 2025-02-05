@@ -1,0 +1,29 @@
+{# Форма добавления задачи #}
+<form id="add-task-form-{{ project.id }}"
+      hx-post="{% url 'add_task' project.id %}"
+      hx-target="#tasks-container-{{ project.id }}"
+      hx-swap="innerHTML"
+      hx-include="#add-task-form-{{ project.id }}">
+
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <input type="text" name="name" class="form-control" placeholder="Enter task name..." required>
+        <button class="btn btn-success">➕ Add Task</button>
+    </div>
+</form>
+
+{# Список задач #}
+<ul class="list-group">
+    {% for task in tasks %}
+        <li class="list-group-item d-flex justify-content-between">
+            <strong>{{ task.name }}</strong>
+            <div>
+                <button class="btn btn-sm btn-outline-secondary">🔼</button>
+                <button class="btn btn-sm btn-outline-primary">✏️</button>
+                <button class="btn btn-sm btn-outline-danger">🗑</button>
+            </div>
+        </li>
+    {% empty %}
+        <li class="list-group-item text-muted">No tasks available</li>
+    {% endfor %}
+</ul>

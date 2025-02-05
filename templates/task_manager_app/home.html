@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>My Projects</h2>
+
+    <div id="projects-container">
+        <div id="projects-content"
+             hx-get="{% url 'load_projects' %}"
+             hx-trigger="load"
+             hx-target="#projects-content"
+             hx-swap="innerHTML">
+        </div>
+    </div>
+{% endblock %}
