@@ -1,16 +1,46 @@
 {# Add Task Form #}
 {% include "task_manager_app/add_task_form.html" %}
 
-{# Task List #}
-<ul class="list-group">
+<table class="table table-striped table-bordered">
+    <thead class="table-white">
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Deadline</th>
+        <th>Priority</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for task in tasks %}
-        <li class="list-group-item d-flex justify-content-between">
-            <strong>{{ task.name }}</strong>
-            <div>
-                {# Change Priority Task #}
-                <button class="btn btn-sm btn-outline-secondary">🔼</button>
+        <tr>
+            <td><strong>{{ task.name }}</strong></td>
+            <td>{{ task.get_status_display }}</td>
+            <td>{{ task.deadline|date:"d.m.Y H:i" }}</td>
+            <td>{{ task.get_priority_display }}</td>
+            <td class="d-flex gap-2">
                 {# Update Task #}
-                <button class="btn btn-sm btn-outline-primary">✏️</button>
+                <button class="btn btn-sm btn-outline-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editTaskModal-{{ task.id }}">
+                    ✏️
+                </button>
+                <div class="modal fade" id="editTaskModal-{{ task.id }}" tabindex="-1"
+                     aria-labelledby="editTaskModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% include "task_manager_app/update_task_form.html" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {# Delete Task #}
                 <form hx-post="{% url 'delete_task' task.id %}"
                       hx-target="#tasks-content-{{ task.project.id }}"
@@ -20,9 +50,12 @@
                     {% csrf_token %}
                     <button class="btn btn-sm btn-danger">🗑 Delete</button>
                 </form>
-            </div>
-        </li>
+            </td>
+        </tr>
     {% empty %}
-        <li class="list-group-item text-muted">No tasks available</li>
+        <tr>
+            <td colspan="5" class="text-center text-muted">No tasks available</td>
+        </tr>
     {% endfor %}
-</ul>
+    </tbody>
+</table>

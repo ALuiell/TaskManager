@@ -1,0 +1,51 @@
+<form id="update-task-form-{{ task.id }}"
+      hx-post="{% url 'update_task' task.id %}"
+      hx-target="#tasks-content-{{ task.project.id }}"
+      hx-swap="innerHTML">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="task-name-{{ task.id }}" class="form-label">Task Name:</label>
+        <input type="text" id="task-name-{{ task.id }}" name="name" class="form-control"
+               placeholder="Enter task name..."
+               value={{ task.name }} required>
+    </div>
+
+    <div class="mb-3">
+        <label for="task-deadline-{{ task.id }}" class="form-label">Deadline:</label>
+        <input type="datetime-local" id="task-deadline-{{ task.id }}" name="deadline" class="form-control"
+               value="{{ task.deadline|date:'Y-m-d\\TH:i' }}"
+               min="{{ now|date:'Y-m-d\\TH:i' }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="task-priority-{{ task.id }}" class="form-label">Priority:</label>
+        <select id="task-priority-{{ task.id }}" name="priority" class="form-select">
+            {% for value, label in priority_choices %}
+                <option value="{{ value }}" {% if task.priority == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="task-status-{{ task.id }}" class="form-label">Status:</label>
+        <select id="task-status-{{ task.id }}" name="status" class="form-select">
+            {% for value, label in task_status_choices %}
+                <option value="{{ value }}" {% if task.status == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success"
+            onclick="(function(){
+                    var modalEl = document.getElementById('editTaskModal-{{ task.id }}');
+                    if(modalEl) {
+                    var modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    modalInstance.hide();
+                    }
+                    })()">
+        Submit Task
+    </button>
+</form>
