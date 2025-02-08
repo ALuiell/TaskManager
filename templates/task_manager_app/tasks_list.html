@@ -1,61 +1,88 @@
+{% load static %}
 {# Add Task Form #}
 {% include "task_manager_app/add_task_form.html" %}
 
-<table class="table table-striped table-bordered">
-    <thead class="table-white">
-    <tr>
+<div class="table-responsive">
+  <table class="table custom-table">
+    <thead>
+      <tr>
         <th>Name</th>
         <th>Status</th>
         <th>Deadline</th>
         <th>Priority</th>
         <th>Actions</th>
-    </tr>
+      </tr>
     </thead>
     <tbody>
-    {% for task in tasks %}
+      {% for task in tasks %}
         <tr>
-            <td><strong>{{ task.name }}</strong></td>
-            <td>{{ task.get_status_display }}</td>
-            <td>{{ task.deadline|date:"d.m.Y H:i" }}</td>
-            <td>{{ task.get_priority_display }}</td>
-            <td class="d-flex gap-2">
-                {# Update Task #}
-                <button class="btn btn-sm btn-outline-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#editTaskModal-{{ task.id }}">
-                    ✏️
-                </button>
-                <div class="modal fade" id="editTaskModal-{{ task.id }}" tabindex="-1"
-                     aria-labelledby="editTaskModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                {% include "task_manager_app/update_task_form.html" %}
-                            </div>
-                        </div>
-                    </div>
+          <td><strong>{{ task.name }}</strong></td>
+          <td>
+            {% if task.status == "new" %}
+              <span class="badge bg-primary"><i class="bi bi-plus-circle"></i></span>
+            {% elif task.status == "in_progress" %}
+              <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i></span>
+            {% elif task.status == "completed" %}
+              <span class="badge bg-success"><i class="bi bi-check-circle"></i></span>
+            {% endif %}
+          </td>
+          <td>
+            {% if task.deadline %}
+              {% for key, value in hours_left_dict.items %}
+                {% if key == task.id %}
+                  <span><i class="bi bi-clock"></i> <strong>{{ value }}h left</strong></span>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </td>
+          <td>
+            {% if task.priority == 1 %}
+              <span class="badge bg-success"><i class="bi bi-arrow-down-circle"></i></span>
+            {% elif task.priority == 2 %}
+              <span class="badge bg-warning text-dark"><i class="bi bi-dash-circle"></i></span>
+            {% elif task.priority == 3 %}
+              <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i></span>
+            {% endif %}
+          </td>
+          <td class="d-flex gap-2">
+            <!-- Update Task -->
+            <button class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editTaskModal-{{ task.id }}">
+              ✏️
+            </button>
+            <div class="modal fade" id="editTaskModal-{{ task.id }}" tabindex="-1"
+                 aria-labelledby="editTaskModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {% include "task_manager_app/update_task_form.html" %}
+                  </div>
                 </div>
+              </div>
+            </div>
 
-                {# Delete Task #}
-                <form hx-post="{% url 'delete_task' task.id %}"
-                      hx-target="#tasks-content-{{ task.project.id }}"
-                      hx-swap="innerHTML"
-                      hx-confirm="Are you sure you want to delete this task?"
-                      class="d-inline">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-danger">🗑 Delete</button>
-                </form>
-            </td>
+            <!-- Delete Task -->
+            <form hx-post="{% url 'delete_task' task.id %}"
+                  hx-target="#tasks-content-{{ task.project.id }}"
+                  hx-swap="innerHTML"
+                  hx-confirm="Are you sure you want to delete this task?"
+                  class="d-inline">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-danger">🗑</button>
+            </form>
+          </td>
         </tr>
-    {% empty %}
+      {% empty %}
         <tr>
-            <td colspan="5" class="text-center text-muted">No tasks available</td>
+          <td colspan="5" class="text-center text-muted">No tasks available</td>
         </tr>
-    {% endfor %}
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</div>

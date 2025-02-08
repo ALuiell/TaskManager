@@ -23,10 +23,8 @@ class Task(models.Model):
 
     PRIORITY_CHOICES = [
         (1, "Low"),
-        (2, "Below Normal"),
-        (3, "Normal"),
-        (4, "High"),
-        (5, "Critical"),
+        (2, "Normal"),
+        (3, "High"),
     ]
 
     name = models.CharField(max_length=255)

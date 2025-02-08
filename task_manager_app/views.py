@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Project, Task
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
@@ -59,10 +59,21 @@ def load_tasks_view(request, project_id):
     tasks = project.tasks.all()
     priority_choices = Task.PRIORITY_CHOICES
     task_status_choices = Task.STATUS_CHOICES
+    now = datetime.now()
+    hours_left_dict = {}
+    for task in tasks:
+        if task.deadline:
+            now_with_tz = now.astimezone(task.deadline.tzinfo)
+            delta = task.deadline - now_with_tz
+            hours = delta.total_seconds() // 3600
+            hours_left_dict[task.id] = int(hours)
+
+
     return render(request, "task_manager_app/tasks_list.html", {"tasks": tasks, "project": project,
                                                                 "priority_choices": priority_choices,
                                                                 "task_status_choices": task_status_choices,
-                                                                "now":datetime.now()})
+                                                                "now":datetime.now(),
+                                                                "hours_left_dict": hours_left_dict})
 
 @login_required
 def add_task_view(request, project_id):
@@ -71,8 +82,6 @@ def add_task_view(request, project_id):
         task_name = request.POST.get("name")
         task_priority = request.POST.get("priority")
         task_deadline = request.POST.get("deadline")
-        priority_choices = Task.PRIORITY_CHOICES
-        task_status_choices = Task.STATUS_CHOICES
         if not task_name:
             return HttpResponseBadRequest("Task name is required.")
 
@@ -86,12 +95,7 @@ def add_task_view(request, project_id):
 
         Task.objects.create(name=task_name, project=project, priority=task_priority, deadline=task_deadline)
 
-        tasks = project.tasks.all()
-        return render(request, "task_manager_app/tasks_list.html", {"tasks": tasks,
-                                                                    "project": project,
-                                                                    'priority_choices': priority_choices,
-                                                                    'task_status_choices': task_status_choices,
-                                                                    "now": datetime.now()})
+        return redirect('load_tasks', project_id=project_id)
 
 @login_required
 def update_task_view(request, task_id):
@@ -102,22 +106,13 @@ def update_task_view(request, task_id):
         task_status = request.POST.get("status")
 
         task = get_object_or_404(Task, id=task_id)
-        project = get_object_or_404(Project, id=task.project.id)
         if (task_name, task_priority, task_status, task_deadline) != (task.name, task.priority, task.status, task.deadline):
             task.name = task_name
             task.priority = int(task_priority)
             task.status = task_status
             task.deadline = datetime.strptime(task_deadline, "%Y-%m-%dT%H:%M") if task_deadline != "" else None
             task.save()
-            tasks = project.tasks.all()
-            return render(request, "task_manager_app/tasks_list.html", {
-                "tasks": tasks,
-                "project": project,
-                "priority_choices": Task.PRIORITY_CHOICES,
-                "task_status_choices": Task.STATUS_CHOICES,
-                "now": datetime.now()
-            })
-
+            return redirect('load_tasks', project_id=task.project.id)
 
 
 def get_update_task_form_view(request, task_id):
@@ -136,6 +131,5 @@ def delete_task_view(request, task_id):
         project = task.project
         task.delete()
 
-        tasks = Task.objects.filter(project=project)
-        return render(request, "task_manager_app/tasks_list.html", {"tasks": tasks, "project": project})
+        return redirect('load_tasks', project_id=project.id)
 
