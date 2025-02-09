@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Project, Task
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -40,8 +40,7 @@ def update_project_view(request, project_id):
         project.name = project_name
         project.save()
 
-        projects = Project.objects.filter(user=request.user)
-        return render(request, "task_manager_app/projects_list.html", {"projects": projects})
+        return render(request, "task_manager_app/project_item.html", {"project": project})
 
 @login_required
 def delete_project_view(request, project_id):
@@ -49,8 +48,9 @@ def delete_project_view(request, project_id):
         project = get_object_or_404(Project, pk=project_id, user=request.user)
         project.delete()
 
-    projects = Project.objects.filter(user=request.user)
-    return render(request, "task_manager_app/projects_list.html", {"projects": projects})
+    # projects = Project.objects.filter(user=request.user)
+    # return render(request, "task_manager_app/projects_list.html", {"projects": projects})
+    return HttpResponse("")
 
 
 

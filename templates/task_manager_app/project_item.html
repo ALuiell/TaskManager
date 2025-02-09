@@ -1,52 +1,53 @@
-<div class="container mt-4">
-  <div class="card mb-4">
-    {# Project Name Display #}
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center project-header"
-         onmouseover="this.classList.add('hovered')"
-         onmouseout="this.classList.remove('hovered')">
-      <h5 id="project-name-{{ project.id }}" class="m-0">
-        <i class="bi bi-folder-fill"></i> {{ project.name }}
-      </h5>
-      <div class="project-buttons d-none">
-        <button class="btn btn-sm btn-outline-light" onclick="document.getElementById('edit-form-{{ project.id }}').classList.toggle('d-none')">
-          ✏️
-        </button>
+<div id="project-{{ project.id }}">
+  <div class="container mt-4">
+    <div class="card mb-4">
+      {# Project Name Display #}
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center project-header"
+           onmouseover="this.classList.add('hovered')"
+           onmouseout="this.classList.remove('hovered')">
+        <h5 id="project-name-{{ project.id }}" class="m-0">
+          <i class="bi bi-folder-fill"></i> {{ project.name }}
+        </h5>
+        <div class="project-buttons d-none">
+          <button class="btn btn-sm btn-outline-light" onclick="document.getElementById('edit-form-{{ project.id }}').classList.toggle('d-none')">
+            ✏️
+          </button>
           {# Delete Project Form #}
-        <form hx-post="{% url 'delete_project' project.id %}"
-              hx-target="#projects-content"
-              hx-swap="innerHTML"
-              hx-confirm="Are you sure you want to delete this project?"
-              class="d-inline">
-          {% csrf_token %}
-          <button class="btn btn-sm btn-danger">🗑</button>
-        </form>
+          <form hx-post="{% url 'delete_project' project.id %}"
+                hx-target="#project-{{ project.id }}"
+                hx-swap="delete"
+                hx-confirm="Are you sure you want to delete this project?"
+                class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-danger">🗑</button>
+          </form>
+        </div>
       </div>
-    </div>
 
+      <div class="card-body">
+        {# Hidden Edit Form #}
+        <div id="edit-form-{{ project.id }}" class="card p-3 mb-3 d-none">
+          <form hx-post="{% url 'update_project' project.id %}"
+                hx-target="#project-{{ project.id }}"
+                hx-swap="innerHTML">
+            {% csrf_token %}
+            <div class="mb-2">
+              <label for="project-name-{{ project.id }}" class="form-label">Project Name</label>
+              <input type="text" id="project-name-{{ project.id }}" name="name" class="form-control"
+                     value="{{ project.name }}" required>
+            </div>
+            <button class="btn btn-success w-100">✔️ Save</button>
+          </form>
+        </div>
 
-
-    {# Card Body #}
-    <div class="card-body">
-      {# Hidden Edit Form #}
-      <div id="edit-form-{{ project.id }}" class="card p-3 mb-3 d-none">
-        <form hx-post="{% url 'update_project' project.id %}" hx-target="#projects-content" hx-swap="innerHTML">
-          {% csrf_token %}
-          <div class="mb-2">
-            <label for="project-name-{{ project.id }}" class="form-label">Project Name</label>
-            <input type="text" id="project-name-{{ project.id }}" name="name" class="form-control"
-                   value="{{ project.name }}" required>
+        {# Task List #}
+        <div id="tasks-container">
+          <div id="tasks-content-{{ project.id }}"
+               hx-get="{% url 'load_tasks' project.id %}"
+               hx-trigger="load"
+               hx-target="#tasks-content-{{ project.id }}"
+               hx-swap="innerHTML">
           </div>
-          <button class="btn btn-success w-100">✔️ Save</button>
-        </form>
-      </div>
-
-      {# Task List #}
-      <div id="tasks-container">
-        <div id="tasks-content-{{ project.id }}"
-             hx-get="{% url 'load_tasks' project.id %}"
-             hx-trigger="load"
-             hx-target="#tasks-content-{{ project.id }}"
-             hx-swap="innerHTML">
         </div>
       </div>
     </div>

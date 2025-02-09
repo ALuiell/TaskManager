@@ -1,5 +1,24 @@
 {# Add Project Form #}
-{% include "task_manager_app/add_project_form.html" %}
+<div class="fixed-bottom d-flex justify-content-center mb-3">
+  <button class="btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+    ➕ Add TODO List
+  </button>
+</div>
+<div class="modal fade" id="createProjectModal" tabindex="-1"
+     aria-labelledby="createProjectModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createProjectModal">Add TODO List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% include "task_manager_app/add_project_form.html" %}
+            </div>
+        </div>
+    </div>
+</div>
 
 {# Project list #}
 <div id="projects-content">

@@ -90,7 +90,7 @@ DATABASES = {
     }
 }
 
-
+# Uncomment this block when deploying with Docker
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
