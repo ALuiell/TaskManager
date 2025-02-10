@@ -85,8 +85,7 @@ def add_task_view(request, project_id):
         if not task_name:
             return HttpResponseBadRequest("Task name is required.")
 
-        if task_priority and task_priority.isdigit():
-            task_priority = int(task_priority)
+        task_priority = int(task_priority) if task_priority and task_priority.isdigit() else 2
 
         if task_deadline:
             task_deadline = datetime.strptime(task_deadline, "%Y-%m-%dT%H:%M")
@@ -106,6 +105,8 @@ def update_task_view(request, task_id):
         task_status = request.POST.get("status")
 
         task = get_object_or_404(Task, id=task_id)
+        if task.project.user != request.user:
+            return HttpResponseForbidden("Access denied.")
         if (task_name, task_priority, task_status, task_deadline) != (task.name, task.priority, task.status, task.deadline):
             task.name = task_name
             task.priority = int(task_priority)
@@ -126,7 +127,7 @@ def delete_task_view(request, task_id):
         task = get_object_or_404(Task, id=task_id)
 
         if task.project.user != request.user:
-            return HttpResponseForbidden("You do not have permission to delete this task.")
+            return HttpResponseForbidden("Access denied.")
 
         project = task.project
         task.delete()

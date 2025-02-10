@@ -28,9 +28,9 @@ class Task(models.Model):
     ]
 
     name = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NEW)
     deadline = models.DateTimeField(null=True, blank=True)
-    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=3)
+    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=2)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
 
     class Meta:
